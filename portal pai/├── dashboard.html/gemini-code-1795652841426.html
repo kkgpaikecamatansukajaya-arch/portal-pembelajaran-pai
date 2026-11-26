@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - Portal PAI SDN Kiarapandak 01</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="/css/style.css" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+  <!-- Top Navbar -->
+  <nav class="navbar navbar-pai sticky-top py-2">
+    <div class="container-fluid px-3 px-lg-4">
+      <div class="d-flex align-items-center gap-2">
+        <button class="btn btn-light d-lg-none rounded-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar">
+          <i data-lucide="menu"></i>
+        </button>
+        <a class="navbar-brand d-flex align-items-center gap-2" href="/dashboard.html">
+          <span class="brand-badge"><i data-lucide="layout-dashboard"></i></span>
+          <div>
+            <div class="fw-bold lh-1" style="color: var(--pai-green-dark);">DASHBOARD PAI</div>
+            <small class="text-muted fw-semibold" style="font-size:0.72rem;">SDN KIARAPANDAK 01</small>
+          </div>
+        </a>
+      </div>
+
+      <div class="d-flex align-items-center gap-3">
+        <span class="badge bg-success-subtle text-success-emphasis rounded-pill d-none d-md-inline-flex align-items-center gap-1 px-3 py-2">
+          <span class="rounded-circle bg-success d-inline-block" style="width:8px;height:8px;"></span> Realtime Aktif
+        </span>
+        <a href="/profil.html" class="d-flex align-items-center gap-2 text-decoration-none text-dark">
+          <img
+            id="navUserAvatar"
+            src="https://ui-avatars.com/api/?name=PAI&background=0d9488&color=fff&size=64"
+            alt="Avatar"
+            class="rounded-circle border"
+            style="width:36px;height:36px;object-fit:cover;"
+          />
+          <div class="d-none d-sm-block lh-1">
+            <div id="navUserName" class="fw-bold small">Memuat...</div>
+            <small id="navUserRole" class="text-muted" style="font-size:0.72rem;"></small>
+          </div>
+        </a>
+        <button id="btnLogout" class="btn btn-outline-danger btn-sm rounded-3">Keluar</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Desktop Sidebar -->
+      <aside class="col-lg-3 col-xl-2 sidebar-pai p-3 d-none d-lg-block" id="desktopSidebarNav"></aside>
+
+      <!-- Mobile Offcanvas Sidebar -->
+      <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileSidebar">
+        <div class="offcanvas-header border-bottom">
+          <h5 class="offcanvas-title fw-bold" style="color: var(--pai-green-dark);">Menu Portal PAI</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body" id="mobileSidebarNav"></div>
+      </div>
+
+      <!-- Main Content -->
+      <main class="col-lg-9 col-xl-10 p-3 p-md-4">
+        <!-- Header Selamat Datang -->
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+          <div>
+            <h3 class="fw-bold mb-1" id="welcomeTitle">Assalamu'alaikum!</h3>
+            <p class="text-muted mb-0" id="welcomeSubtitle">Ringkasan aktivitas & statistik pembelajaran PAI SDN Kiarapandak 01</p>
+          </div>
+          <div class="d-flex flex-wrap gap-2" id="exportButtonsGroup">
+            <button id="btnExportExcel" class="btn btn-success btn-sm rounded-3 fw-semibold">
+              <i data-lucide="file-spreadsheet" class="me-1" style="width:16px;height:16px;"></i> Ekspor Excel
+            </button>
+            <button id="btnExportPdf" class="btn btn-danger btn-sm rounded-3 fw-semibold">
+              <i data-lucide="file-down" class="me-1" style="width:16px;height:16px;"></i> Ekspor PDF
+            </button>
+          </div>
+        </div>
+
+        <!-- Kartu Statistik (8 Metrik Utama) -->
+        <div class="row g-3 mb-4">
+          <div class="col-6 col-md-4 col-xl-3">
+            <div class="pai-card p-3 stat-card-green h-100">
+              <small class="text-muted fw-semibold">Jumlah Siswa</small>
+              <h3 class="fw-bold mt-1 mb-0" id="statStudents">0</h3>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-xl-3">
+            <div class="pai-card p-3 stat-card-blue h-100">
+              <small class="text-muted fw-semibold">Jumlah Guru PAI</small>
+              <h3 class="fw-bold mt-1 mb-0" id="statTeachers">0</h3>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-xl-3">
+            <div class="pai-card p-3 stat-card-yellow h-100">
+              <small class="text-muted fw-semibold">Jumlah Materi</small>
+              <h3 class="fw-bold mt-1 mb-0" id="statMaterials">0</h3>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-xl-3">
+            <div class="pai-card p-3 stat-card-purple h-100">
+              <small class="text-muted fw-semibold">Tugas & Kuis</small>
+              <h3 class="fw-bold mt-1 mb-0" id="statTasksQuizzes">0</h3>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-xl-3">
+            <div class="pai-card p-3 h-100">
+              <small class="text-muted fw-semibold">Rata-Rata Nilai Kuis</small>
+              <h3 class="fw-bold mt-1 mb-0 text-primary" id="statAvgScore">0.0</h3>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-xl-3">
+            <div class="pai-card p-3 h-100">
+              <small class="text-muted fw-semibold">Pengumpulan Tugas</small>
+              <h3 class="fw-bold mt-1 mb-0 text-success" id="statSubmissions">0</h3>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-xl-3">
+            <div class="pai-card p-3 h-100">
+              <small class="text-muted fw-semibold">Poin Prestasi Saya</small>
+              <h3 class="fw-bold mt-1 mb-0 text-warning" id="statMyPoints">0</h3>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-xl-3">
+            <div class="pai-card p-3 h-100">
+              <small class="text-muted fw-semibold">Kelas Aktif</small>
+              <h3 class="fw-bold mt-1 mb-0" id="statClassesCount">6</h3>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grafik Perkembangan Nilai & Rekap per Kelas -->
+        <div class="row g-4 mb-4">
+          <div class="col-lg-7">
+            <div class="pai-card p-4 h-100">
+              <h5 class="fw-bold mb-3">Grafik Perkembangan Nilai Kuis</h5>
+              <canvas id="scoreProgressChart" height="140"></canvas>
+            </div>
+          </div>
+          <div class="col-lg-5">
+            <div class="pai-card p-4 h-100">
+              <h5 class="fw-bold mb-3">Rekap Rata-Rata Nilai per Kelas</h5>
+              <canvas id="classAverageChart" height="175"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pengumuman Realtime & Peringkat Siswa (Leaderboard) -->
+        <div class="row g-4 mb-4">
+          <div class="col-lg-6">
+            <div class="pai-card p-4 h-100">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Pengumuman Terbaru</h5>
+                <button id="btnOpenAnnouncementModal" class="btn btn-pai-primary btn-sm rounded-3 d-none" data-bs-toggle="modal" data-bs-target="#announcementModal">
+                  + Buat Pengumuman
+                </button>
+              </div>
+              <div id="announcementsList" class="d-flex flex-column gap-3">
+                <p class="text-muted small">Memuat pengumuman...</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="pai-card p-4 h-100">
+              <h5 class="fw-bold mb-3">Peringkat Poin Prestasi Siswa (Top 10)</h5>
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th>#</th>
+                      <th>Nama Siswa</th>
+                      <th>Kelas</th>
+                      <th class="text-end">Poin</th>
+                    </tr>
+                  </thead>
+                  <tbody id="leaderboardBody">
+                    <tr><td colspan="4" class="text-center text-muted">Memuat peringkat...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel Khusus Guru & Admin: Rekap Hasil Evaluasi Siswa -->
+        <div id="teacherEvaluationSection" class="pai-card p-4 mb-4 d-none">
+          <h5 class="fw-bold mb-3">Hasil Evaluasi Kuis Siswa</h5>
+          <div class="table-responsive">
+            <table class="table table-striped align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Nama Siswa</th>
+                  <th>Kelas</th>
+                  <th>Judul Kuis</th>
+                  <th>Benar / Salah</th>
+                  <th>Nilai</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="evaluationTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Panel Khusus Admin: Kelola Akun, Kelas 1-6, Mapel & Galeri -->
+        <div id="adminManagementSection" class="pai-card p-4 mb-4 d-none">
+          <h4 class="fw-bold mb-3" style="color: var(--pai-green-dark);">Panel Administrasi Sekolah (Admin)</h4>
+          <ul class="nav nav-pills mb-3 gap-2" id="adminTabs">
+            <li class="nav-item"><button class="nav-link active rounded-3" data-bs-toggle="pill" data-bs-target="#tabUsers">Akun Guru & Siswa</button></li>
+            <li class="nav-item"><button class="nav-link rounded-3" data-bs-toggle="pill" data-bs-target="#tabClasses">Kelas & Tahun Ajaran</button></li>
+            <li class="nav-item"><button class="nav-link rounded-3" data-bs-toggle="pill" data-bs-target="#tabSubjects">Mata Pelajaran</button></li>
+            <li class="nav-item"><button class="nav-link rounded-3" data-bs-toggle="pill" data-bs-target="#tabGalleries">Galeri Foto & Video</button></li>
+          </ul>
+
+          <div class="tab-content">
+            <!-- Tab 1: Pengguna -->
+            <div class="tab-pane fade show active" id="tabUsers">
+              <p class="text-muted small">
+                Ubah peran (<code>admin</code>, <code>guru</code>, <code>siswa</code>) atau penempatan kelas pengguna. Untuk membuat akun login baru secara aman, tambahkan pengguna di <strong>Supabase Auth &gt; Users</strong> (profil otomatis terbuat via trigger).
+              </p>
+              <div class="table-responsive">
+                <table class="table table-bordered align-middle small">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Nama Lengkap</th>
+                      <th>Username</th>
+                      <th>Role</th>
+                      <th>Kelas</th>
+                      <th>Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminUsersBody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Tab 2: Kelas & Tahun Pelajaran -->
+            <div class="tab-pane fade" id="tabClasses">
+              <form id="addClassForm" class="row g-2 mb-3">
+                <div class="col-md-5">
+                  <input type="text" id="newClassName" class="form-control" placeholder="Nama Kelas (misal: Kelas 6A)" required />
+                </div>
+                <div class="col-md-4">
+                  <input type="text" id="newAcademicYear" class="form-control" value="2026/2027" required />
+                </div>
+                <div class="col-md-3">
+                  <button type="submit" class="btn btn-pai-primary w-100">+ Tambah Kelas</button>
+                </div>
+              </form>
+              <div id="adminClassesList" class="d-flex flex-wrap gap-2"></div>
+            </div>
+
+            <!-- Tab 3: Mata Pelajaran -->
+            <div class="tab-pane fade" id="tabSubjects">
+              <form id="addSubjectForm" class="row g-2 mb-3">
+                <div class="col-md-5">
+                  <input type="text" id="newSubjectName" class="form-control" placeholder="Nama Mata Pelajaran" required />
+                </div>
+                <div class="col-md-5">
+                  <input type="text" id="newSubjectDesc" class="form-control" placeholder="Keterangan singkat" />
+                </div>
+                <div class="col-md-2">
+                  <button type="submit" class="btn btn-pai-primary w-100">Simpan</button>
+                </div>
+              </form>
+              <ul id="adminSubjectsList" class="list-group"></ul>
+            </div>
+
+            <!-- Tab 4: Galeri -->
+            <div class="tab-pane fade" id="tabGalleries">
+              <form id="addGalleryForm" class="row g-3 mb-3">
+                <div class="col-md-4">
+                  <input type="text" id="galleryTitle" class="form-control" placeholder="Judul kegiatan" required />
+                </div>
+                <div class="col-md-3">
+                  <select id="galleryMediaType" class="form-select">
+                    <option value="image">Foto</option>
+                    <option value="video">Video</option>
+                  </select>
+                </div>
+                <div class="col-md-5">
+                  <input type="file" id="galleryFile" class="form-control" accept="image/*,video/*" required />
+                </div>
+                <div class="col-12">
+                  <input type="text" id="galleryDesc" class="form-control" placeholder="Deskripsi singkat kegiatan" />
+                </div>
+                <div class="col-12">
+                  <button type="submit" class="btn btn-pai-primary">Unggah ke Galeri</button>
+                </div>
+              </form>
+              <div id="adminGalleryList" class="row g-3"></div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal Buat Pengumuman -->
+  <div class="modal fade" id="announcementModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 border-0">
+        <div class="modal-header border-0">
+          <h5 class="modal-title fw-bold">Kirim Pengumuman Baru</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="announcementForm">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Judul Pengumuman</label>
+              <input type="text" id="announcementTitle" class="form-control rounded-3" required />
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Target Kelas</label>
+              <select id="announcementClassSelect" class="form-select rounded-3">
+                <option value="">Semua Kelas (1–6)</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Isi Pengumuman</label>
+              <textarea id="announcementContent" rows="4" class="form-control rounded-3" required></textarea>
+            </div>
+          </div>
+          <div class="modal-footer border-0">
+            <button type="button" class="btn btn-light rounded-3" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" class="btn btn-pai-primary rounded-3">Publikasikan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/supabase.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

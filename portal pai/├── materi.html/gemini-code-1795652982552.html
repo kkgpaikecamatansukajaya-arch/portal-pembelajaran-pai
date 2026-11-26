@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Materi Pembelajaran PAI - SDN Kiarapandak 01</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="/css/style.css" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <nav class="navbar navbar-pai sticky-top py-2">
+    <div class="container-fluid px-3 px-lg-4">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="/dashboard.html">
+        <span class="brand-badge"><i data-lucide="book-open"></i></span>
+        <span class="fw-bold" style="color: var(--pai-green-dark);">MATERI PAI • SDN KIARAPANDAK 01</span>
+      </a>
+      <div class="d-flex align-items-center gap-2">
+        <span id="navUserName" class="small fw-semibold d-none d-md-inline"></span>
+        <a href="/dashboard.html" class="btn btn-outline-secondary btn-sm rounded-3">Dashboard</a>
+        <button id="btnLogout" class="btn btn-outline-danger btn-sm rounded-3">Keluar</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+      <div>
+        <h3 class="fw-bold mb-1">Materi Pembelajaran PAI & Budi Pekerti</h3>
+        <p class="text-muted mb-0">Al-Qur'an & Hadis • Akidah • Akhlak • Fikih • Sejarah Peradaban Islam</p>
+      </div>
+      <button id="btnAddMaterial" class="btn btn-pai-primary d-none" data-bs-toggle="modal" data-bs-target="#materialFormModal">
+        + Tambah Materi Baru
+      </button>
+    </div>
+
+    <!-- Filter Kelas & Kategori -->
+    <div class="pai-card p-3 mb-4">
+      <div class="row g-2">
+        <div class="col-md-4">
+          <select id="filterClass" class="form-select rounded-3">
+            <option value="">Semua Kelas</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <select id="filterCategory" class="form-select rounded-3">
+            <option value="">Semua Kategori Materi</option>
+            <option value="Al-Qur'an dan Hadis">Al-Qur'an dan Hadis</option>
+            <option value="Akidah">Akidah</option>
+            <option value="Akhlak">Akhlak</option>
+            <option value="Fikih">Fikih</option>
+            <option value="Sejarah Peradaban Islam">Sejarah Peradaban Islam</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <input type="text" id="searchMaterialInput" class="form-control rounded-3" placeholder="Cari judul atau bab materi..." />
+        </div>
+      </div>
+    </div>
+
+    <!-- Daftar Materi -->
+    <div id="materialsGrid" class="row g-4">
+      <div class="col-12 text-center text-muted py-4">Memuat materi pembelajaran...</div>
+    </div>
+  </div>
+
+  <!-- Modal Baca Materi Lengkap -->
+  <div class="modal fade" id="readMaterialModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content rounded-4 border-0">
+        <div class="modal-header border-bottom">
+          <div>
+            <span id="readMatCategory" class="badge bg-success-subtle text-success-emphasis mb-1"></span>
+            <h5 id="readMatTitle" class="modal-title fw-bold"></h5>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="readMatBody"></div>
+        <div class="modal-footer border-top">
+          <button type="button" class="btn btn-pai-primary rounded-3" data-bs-dismiss="modal">Selesai Membaca</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Form Tambah / Edit Materi (Guru & Admin) -->
+  <div class="modal fade" id="materialFormModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content rounded-4 border-0">
+        <div class="modal-header border-bottom">
+          <h5 class="modal-title fw-bold" id="materialModalTitle">Tambah Materi Pembelajaran</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="materialForm">
+          <div class="modal-body">
+            <input type="hidden" id="editMaterialId" />
+            <div class="row g-3">
+              <div class="col-md-8">
+                <label class="form-label fw-semibold">Judul Materi</label>
+                <input type="text" id="matTitle" class="form-control" required />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">Kelas</label>
+                <select id="matClassId" class="form-select" required></select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Kategori</label>
+                <select id="matCategory" class="form-select" required>
+                  <option value="Al-Qur'an dan Hadis">Al-Qur'an dan Hadis</option>
+                  <option value="Akidah">Akidah</option>
+                  <option value="Akhlak">Akhlak</option>
+                  <option value="Fikih">Fikih</option>
+                  <option value="Sejarah Peradaban Islam">Sejarah Peradaban Islam</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-semibold">Semester</label>
+                <select id="matSemester" class="form-select">
+                  <option value="Ganjil">Ganjil</option>
+                  <option value="Genap">Genap</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-semibold">Bab</label>
+                <input type="text" id="matChapter" class="form-control" placeholder="Bab 1" />
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-semibold">Tujuan & Capaian Pembelajaran</label>
+                <textarea id="matDescription" rows="2" class="form-control" placeholder="Tuliskan tujuan dan capaian pembelajaran..."></textarea>
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-semibold">Ringkasan Materi, Latihan Soal & Refleksi</label>
+                <textarea id="matContent" rows="5" class="form-control" required placeholder="Isi ringkasan materi, contoh latihan soal, dan refleksi pembelajaran..."></textarea>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Gambar Ilustrasi (Opsional)</label>
+                <input type="file" id="matImageFile" class="form-control" accept="image/*" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">File Pendukung PDF/Word/PPT (Opsional)</label>
+                <input type="file" id="matDocFile" class="form-control" accept=".pdf,.doc,.docx,.ppt,.pptx,image/*" />
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-semibold">Tautan Video Pembelajaran (YouTube / MP4 - Opsional)</label>
+                <input type="url" id="matVideoUrl" class="form-control" placeholder="https://www.youtube.com/watch?v=..." />
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer border-top">
+            <button type="button" class="btn btn-light rounded-3" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" id="btnSaveMaterial" class="btn btn-pai-primary rounded-3">Simpan Materi</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/supabase.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/materi.js"></script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kuis Interaktif PAI - SDN Kiarapandak 01</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="/css/style.css" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <nav class="navbar navbar-pai sticky-top py-2">
+    <div class="container-fluid px-3 px-lg-4">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="/dashboard.html">
+        <span class="brand-badge"><i data-lucide="file-question"></i></span>
+        <span class="fw-bold" style="color: var(--pai-green-dark);">KUIS INTERAKTIF PAI</span>
+      </a>
+      <div class="d-flex align-items-center gap-2">
+        <a href="/dashboard.html" class="btn btn-outline-secondary btn-sm rounded-3">Dashboard</a>
+        <button id="btnLogout" class="btn btn-outline-danger btn-sm rounded-3">Keluar</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+      <div>
+        <h3 class="fw-bold mb-1">Kuis & Evaluasi Pembelajaran PAI</h3>
+        <p class="text-muted mb-0">Pilihan ganda, isian singkat, dan uraian tervalidasi server</p>
+      </div>
+      <button id="btnOpenCreateQuiz" class="btn btn-pai-primary d-none" data-bs-toggle="modal" data-bs-target="#createQuizModal">
+        + Buat Kuis Baru
+      </button>
+    </div>
+
+    <!-- Daftar Kuis -->
+    <div id="quizzesGrid" class="row g-4 mb-4">
+      <div class="col-12 text-center text-muted py-4">Memuat daftar kuis...</div>
+    </div>
+
+    <!-- Area Pengerjaan Kuis Aktif (Siswa) -->
+    <div id="activeQuizRunner" class="pai-card p-4 d-none">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 border-bottom pb-3 mb-4">
+        <div>
+          <h4 id="runnerQuizTitle" class="fw-bold mb-1"></h4>
+          <small id="runnerQuizDesc" class="text-muted"></small>
+        </div>
+        <div class="badge bg-warning text-dark fs-6 px-3 py-2 rounded-pill">
+          Sisa Waktu: <span id="quizTimerDisplay">00:00</span>
+        </div>
+      </div>
+
+      <form id="quizQuestionsForm">
+        <div id="questionsContainer" class="d-flex flex-column gap-4"></div>
+        <div class="mt-4 d-flex gap-2">
+          <button type="submit" id="btnSubmitQuiz" class="btn btn-pai-primary btn-lg">Kumpulkan Jawaban Kuis</button>
+          <button type="button" id="btnCancelQuiz" class="btn btn-outline-secondary btn-lg">Batal</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Hasil & Pembahasan Kuis -->
+    <div id="quizResultBox" class="pai-card p-4 mt-4 d-none"></div>
+  </div>
+
+  <!-- Modal Buat Kuis & Soal (Guru & Admin) -->
+  <div class="modal fade" id="createQuizModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content rounded-4 border-0">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">Buat Kuis Interaktif</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="createQuizForm">
+          <div class="modal-body">
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Judul Kuis</label>
+                <input type="text" id="quizTitleInput" class="form-control" required />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-semibold">Kelas</label>
+                <select id="quizClassSelect" class="form-select" required></select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-semibold">Durasi (Menit)</label>
+                <input type="number" id="quizDurationInput" class="form-control" value="20" min="1" max="180" required />
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-semibold">Deskripsi Kuis</label>
+                <input type="text" id="quizDescInput" class="form-control" placeholder="Petunjuk pengerjaan kuis..." />
+              </div>
+            </div>
+
+            <hr />
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h6 class="fw-bold mb-0">Daftar Butir Soal</h6>
+              <button type="button" id="btnAddQuestionRow" class="btn btn-sm btn-outline-primary">+ Tambah Soal</button>
+            </div>
+            <div id="questionBuilderList" class="d-flex flex-column gap-3"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light rounded-3" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" id="btnSaveQuiz" class="btn btn-pai-primary rounded-3">Simpan Kuis</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/supabase.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/kuis.js"></script>
+</body>
+</html>
